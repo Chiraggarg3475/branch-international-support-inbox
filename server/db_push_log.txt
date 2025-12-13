@@ -1,0 +1,16 @@
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+Datasource "db": SQLite database "dev.db" at "file:./dev.db"
+
+SQLite database dev.db created at file:./dev.db
+Error: P1012
+
+error: Error validating field `urgencyReasons` in model `Conversation`: Field `urgencyReasons` in model `Conversation` can't be of type Json. The current connector does not support the Json type.
+  -->  prisma\schema.prisma:33
+   | 
+32 |   urgencyScore Int      @default(0)
+33 |   urgencyReasons Json   @default("[]") // Structured reasons { rule: string, description: string }
+34 | 
+   | 
+
+

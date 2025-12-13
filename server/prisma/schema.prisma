@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Customer {
+  id        String   @id // User ID from CSV
+  firstName String?  // Inferred
+  lastName  String?
+  email     String?
+  createdAt DateTime @default(now())
+  
+  conversations Conversation[]
+}
+
+model Conversation {
+  id        String   @id @default(uuid())
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id])
+  
+  title     String?  // Deterministic title
+  status    String   @default("OPEN") // OPEN, SNOOZED, RESOLVED
+  
+  // Urgency
+  urgencyScore Int      @default(0)
+  urgencyReasons String   @default("[]") // JSON stringified
+
+  lastMessageAt DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  messages Message[]
+
+  assignedTo String?
+  notes      InternalNote[]
+
+  @@index([urgencyScore])
+  @@index([lastMessageAt])
+}
+
+model InternalNote {
+  id             String       @id @default(uuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  content        String
+  author         String?
+  createdAt      DateTime     @default(now())
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  
+  senderType     String       // "CUSTOMER" or "AGENT"
+  content        String
+  timestamp      DateTime     
+  
+  isRead         Boolean      @default(false)
+}
